@@ -32,7 +32,7 @@ mutation InsertUser( $address: String, $email: String, $password: String, $phone
 `;
 
 export const ADD_ORDER = gql`
-mutation InsertOrder($quantity: Int, $total_price: Float, $image: String, $kurir: String, $product_id: String, $user_id: String) {
+mutation InsertOrder($quantity: Int, $total_price: numeric, $image: String, $kurir: String, $product_id: uuid, $user_id: uuid) {
   insert_order(objects: {quantity: $quantity, total_price: $total_price, image: $image, kurir: $kurir, product_id: $product_id, user_id: $user_id}) {
     affected_rows
     returning {

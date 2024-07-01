@@ -5,6 +5,7 @@ import { GET_PRODUCTS, ADD_USER, ADD_ORDER } from '../Apollo/queries';
 
 export const ProductContext = createContext();
 export const UserContext = createContext();
+export const OrderContext = createContext();
 
 const ProductProvider = ({ children }) => {
   const { loading, error, data } = useQuery(GET_PRODUCTS);
@@ -58,14 +59,14 @@ const UserProvider = ({ children }) => {
 
 const OrderProvider = ({ children }) => {
   const [orders, setOrders] = useState([]);
-  const [placeOrderMutation] = useMutation(ADD_ORDER); // Replace PLACE_ORDER with your actual mutation
+  const [placeOrderMutation] = useMutation(ADD_ORDER);
 
   const placeOrder = async (orderData) => {
     try {
       const { data } = await placeOrderMutation({
         variables: orderData,
       });
-      setOrders([...orders, data.placeOrder]); // Update orders state with the new order
+      setOrders((prevOrders) => [...prevOrders, ...data.insert_order.returning]);
     } catch (err) {
       handleMutationError(err);
     }
@@ -100,5 +101,5 @@ const ApolloWrapper = ({ children }) => (
   </ApolloProvider>
 );
 
-export { ApolloWrapper, ProductProvider, UserProvider };
+export { ApolloWrapper, ProductProvider, UserProvider, OrderProvider };
 

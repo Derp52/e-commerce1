@@ -1,28 +1,56 @@
 import React, { useContext, useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { CartContext } from '../../context/CartContext/CartContext';
+import { OrderContext } from '../../context/ProductContext/ProductContext';
 import { CartItem } from '../../components/Index';
-import { Link } from 'react-router-dom';
+import mockdata from '../../../public/MOCK.json'
 
-function Checkout({item}) {
-  const [image, setImage] = useState("");
-  const [timeLeft, setTimeLeft] = useState(300);
+function Checkout() {
+  const [image, setImage] = useState(null);
+  const [timeLeft, setTimeLeft] = useState(100000000);
   const [kurir, setKurir] = useState("");
-  const {amount} = item;
-  const { total, cart} = useContext(CartContext);
+  const { total, cart } = useContext(CartContext);
+  const { placeOrder } = useContext(OrderContext);
+  const {id_user} = mockdata
   const navigate = useNavigate();
+
+  // Calculate the total quantity of items in the cart
+  const amount = cart.reduce((acc, item) => acc + item.amount, 0);
 
   const handleImageChange = (e) => {
     const selectedImage = e.target.files[0];
     setImage(selectedImage);
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     console.log('Submitted:', image);
     const phoneNumber = '+6282299505783';
-    window.open(`https://wa.me/${phoneNumber}`, '_blank');
-    navigate('/'); // Navigate to home after submitting
+  
+    // Convert total to integer (assuming total is already a number)
+    const totalNumeric = Math.round(total || 0); // Round to nearest integer
+  
+    // Ensure user_id is fetched and not an empty string
+    const userId = id_user || null; // Use null if user_id is ''
+  
+    const orderData = {
+      quantity: amount,
+      total_price: totalNumeric,
+      image: image ? image.name : "",
+      kurir,
+      product_id: cart.map(item => item.id).join(', '),
+      user_id: userId // Pass userId, ensuring it's not an empty string
+    };
+  
+    try {
+      await placeOrder(orderData); // Submit order to the database
+      window.open(`https://wa.me/${phoneNumber}`, '_blank');
+      navigate('/'); // Navigate to home after submitting
+    } catch (error) {
+      console.error('Failed to place order', error);
+    }
   };
+  
+  
 
   useEffect(() => {
     if (timeLeft === 0 && !image) {
@@ -53,13 +81,14 @@ function Checkout({item}) {
         <p className="text-lg">Kirim Pembayaran Ke BCA</p>
         <p className="text-lg">No.Rek 12345678</p>
         <p className="text-lg">Atas Nama David</p>
-        <div className='flex flex-col gap-y-2 overflow-y-auto overflow-x-hidden h-[550px] lg:h=[650px] border-b'>
+        <div className='flex flex-col gap-y-2 overflow-y-auto overflow-x-hidden h-[550px] lg:h-[650px] border-b'>
           {cart.map(item => (
             <CartItem item={item} key={item.id} />
           ))}
         </div>
-        <p><span>Total:</span>Rp {parseFloat(total).toFixed(2)}k</p>
-        <div className='h-full flex justify-center items-center px-3'>{amount}</div>
+        <p><span>Total Item:</span>{amount}</p>
+        <p><span>Total Price:</span>{`Rp ${Math.round(total || 0)}k`}</p>
+        
         <div>
           <input
             type="file"
@@ -103,6 +132,14 @@ function Checkout({item}) {
 }
 
 export default Checkout;
+
+
+
+
+
+
+
+
 
 
 
