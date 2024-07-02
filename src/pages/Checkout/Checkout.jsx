@@ -7,7 +7,7 @@ import mockdata from '../../context/JSON/MOCK.json';
 
 function Checkout() {
   const [image, setImage] = useState(null);
-  const [timeLeft, setTimeLeft] = useState(100000000);
+  const [timeLeft, setTimeLeft] = useState(300);
   const [kurir, setKurir] = useState("");
   const { total, cart } = useContext(CartContext);
   const { placeOrder } = useContext(OrderContext);
