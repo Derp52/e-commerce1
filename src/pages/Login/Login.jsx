@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, Navigate } from 'react-router-dom';
+import mockData from "../../context/JSON/MOCK_DATA.json";
 
 function Login() {
     const [email, setEmail] = useState("");
@@ -8,11 +9,7 @@ function Login() {
     const [users, setUsers] = useState([]);
 
     useEffect(() => {
-        // Fetch the mock data when the component mounts
-        fetch('/MOCK_DATA.json')
-            .then(response => response.json())
-            .then(data => setUsers(data))
-            .catch(error => console.error('Error fetching data:', error));
+        setUsers(mockData);
     }, []);
 
     const handleSubmit = (e) => {
@@ -54,6 +51,7 @@ function Login() {
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                             className="email border border-gray-300 rounded-md px-3 py-2 focus:outline-none hover:bg-pink-50 focus:border-blue-500" 
+                            aria-label="Email"
                         />
                         <label htmlFor="password" className="block mt-4 mb-1">Password</label>
                         <input 
@@ -62,6 +60,7 @@ function Login() {
                             value={password}
                             onChange={(e) => setPassword(e.target.value)} 
                             className="password border border-gray-300 rounded-md px-3 py-2 focus:outline-none hover:bg-pink-50 focus:border-blue-500" 
+                            aria-label="Password"
                         />
                         <div className="flex flex-col items-center mt-4 w-full">
                             <button 
@@ -73,8 +72,8 @@ function Login() {
                             </button>
                         </div>
                     </form>
-                    <small className='mt-4'>Doesn't Have an Account? </small>
-                    <Link to={'/register'} className=" text-center px-4 py-2 bg-pink-500 text-white rounded-md hover:bg-pink-600 focus:outline-none focus:bg-pink-200 w-full" >
+                    <small className='mt-4'>Don't have an account?</small>
+                    <Link to={'/register'} className="text-center px-4 py-2 bg-pink-500 text-white rounded-md hover:bg-pink-600 focus:outline-none focus:bg-pink-200 w-full">
                         Register
                     </Link>
                 </div>
@@ -84,5 +83,6 @@ function Login() {
 }
 
 export default Login;
+
 
 

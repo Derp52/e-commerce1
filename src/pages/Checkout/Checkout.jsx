@@ -3,7 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { CartContext } from '../../context/CartContext/CartContext';
 import { OrderContext } from '../../context/ProductContext/ProductContext';
 import { CartItem } from '../../components/Index';
-import mockdata from '../../../public/MOCK.json'
+import mockdata from '../../context/JSON/MOCK.json';
 
 function Checkout() {
   const [image, setImage] = useState(null);
@@ -88,22 +88,9 @@ function Checkout() {
         </div>
         <p><span>Total Item:</span>{amount}</p>
         <p><span>Total Price:</span>{`Rp ${Math.round(total || 0)}k`}</p>
+
         
-        <div>
-          <input
-            type="file"
-            accept="image/*"
-            onChange={handleImageChange}
-            className="mt-4"
-          />
-          {image && (
-            <img
-              src={URL.createObjectURL(image)}
-              alt="Selected Image"
-              className="mt-4 max-w-full"
-            />
-          )}
-          <label htmlFor="Kurir" className="block mb-1">Kurir</label>
+        <label htmlFor="Kurir" className="block mb-1">Kurir</label>
           <select
             id="Kurir"
             value={kurir}
@@ -118,6 +105,21 @@ function Checkout() {
             <option value="Tiki">Tiki</option>
             <option value="Anteraja">Anteraja</option>
           </select>
+        <div>
+          <input
+            type="file"
+            accept="image/*"
+            onChange={handleImageChange}
+            className="mt-4"
+          />
+          {image && (
+            <img
+              src={URL.createObjectURL(image)}
+              alt="Selected Image"
+              className="mt-4 max-w-full"
+            />
+          )}
+          
           <button
             onClick={handleSubmit}
             disabled={!(image && kurir)}

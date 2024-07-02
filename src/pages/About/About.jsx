@@ -6,10 +6,10 @@ const About = () => {
       <div className="pt-16 container mx-auto p-4">
         <h1 className="text-3xl font-bold mb-4">About Us</h1>
         <p className="mb-4">
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla facilisi.
-          Proin eleifend varius magna, vitae fermentum elit lobortis sed.
-          Quisque nec nisi a ex tincidunt mattis. Vivamus accumsan eros non purus fermentum
-          ultrices. Duis ultricies ligula eu nibh bibendum, sit amet varius metus luctus.
+        Eclectic Milkyway Shop Merupakan toko pakaian yang berpusat di Meruya 
+        Jakarta Barat yang berfokus menjual pakaian regular dan oversized. Eclectic 
+        Milkyway Shop didirikan pada tahun 2013. Moto Eclectic Milkyway adalah 
+        menjual pakaian berkualitas dengan harga yang relatif terjangkau.
         </p>
       </div>
     </div>
