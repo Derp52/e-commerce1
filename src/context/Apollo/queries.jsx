@@ -32,17 +32,29 @@ mutation InsertUser( $address: String, $email: String, $password: String, $phone
 `;
 
 export const ADD_ORDER = gql`
-mutation InsertOrder($quantity: Int, $total_price: numeric, $image: String, $kurir: String, $product_id: uuid, $user_id: uuid) {
-  insert_order(objects: {quantity: $quantity, total_price: $total_price, image: $image, kurir: $kurir, product_id: $product_id, user_id: $user_id}) {
+mutation InsertOrder($quantity: Int, $total_price: numeric, $image: String, $kurir: String, $Date: timestamptz, $id_user: uuid) {
+  insert_order(objects: {quantity: $quantity, total_price: $total_price, image: $image, kurir: $kurir, Date: $Date, id_user: $id_user}) {
     affected_rows
     returning {
       quantity
 			total_price
 			image
 			kurir
-			id
+			Date
+			id_user
+			order_id
+    }
+  }
+}`;
+
+export const ADD_ORDER_PRODUCT = gql`
+mutation InsertOrderProduct($order_id: uuid, $product_id: uuid) {
+  insert_order_product(objects: {order_id: $order_id, product_id: $product_id}) {
+    affected_rows
+    returning {
+      id
+			order_id
 			product_id
-			user_id
     }
   }
 }`;

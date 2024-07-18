@@ -1,6 +1,6 @@
 import React from "react";
 import RootRouter from "./rootRouter";
-import { ApolloWrapper } from "./context/ProductContext/ProductContext.jsx";
+import CombinedProviders from "./context/ProductContext/ProductContext.jsx";
 import SidebarProvider from "./context/SidebarContext/SidebarContext.jsx";
 import CartProvider from "./context/CartContext/CartContext.jsx";
 
@@ -8,9 +8,9 @@ function App() {
   return (
     <SidebarProvider>
       <CartProvider>
-        <ApolloWrapper>
+        <CombinedProviders>
           <RootRouter />
-        </ApolloWrapper>
+        </CombinedProviders>
       </CartProvider>
     </SidebarProvider>
   );

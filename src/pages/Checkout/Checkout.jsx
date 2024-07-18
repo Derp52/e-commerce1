@@ -1,20 +1,21 @@
 import React, { useContext, useState, useEffect } from 'react';
+import { ref, uploadBytes, getDownloadURL } from '@firebase/storage';
 import { useNavigate, Link } from 'react-router-dom';
 import { CartContext } from '../../context/CartContext/CartContext';
 import { OrderContext } from '../../context/ProductContext/ProductContext';
 import { CartItem } from '../../components/Index';
-import mockdata from '../../context/JSON/MOCK.json';
+import { storage } from '../../context/firebase/firebase';
+import mockdata from "../../context/JSON/MOCK.json";
 
 function Checkout() {
   const [image, setImage] = useState(null);
-  const [timeLeft, setTimeLeft] = useState(300);
+  const [timeLeft, setTimeLeft] = useState(300); // 300 seconds for the countdown
   const [kurir, setKurir] = useState("");
   const { total, cart } = useContext(CartContext);
   const { placeOrder } = useContext(OrderContext);
-  const {id_user} = mockdata
+  const { user_id } = mockdata;
   const navigate = useNavigate();
 
-  // Calculate the total quantity of items in the cart
   const amount = cart.reduce((acc, item) => acc + item.amount, 0);
 
   const handleImageChange = (e) => {
@@ -22,35 +23,50 @@ function Checkout() {
     setImage(selectedImage);
   };
 
+  const handleImageUpload = async (file) => {
+    const storageRef = ref(storage, 'images/' + file.name);
+    await uploadBytes(storageRef, file);
+    const downloadURL = await getDownloadURL(storageRef);
+    return downloadURL;
+  };
+  
+  
+
   const handleSubmit = async () => {
-    console.log('Submitted:', image);
     const phoneNumber = '+6282299505783';
+
+    const totalNumeric = Math.round(total || 0);
   
-    // Convert total to integer (assuming total is already a number)
-    const totalNumeric = Math.round(total || 0); // Round to nearest integer
-  
-    // Ensure user_id is fetched and not an empty string
-    const userId = id_user || null; // Use null if user_id is ''
-  
-    const orderData = {
-      quantity: amount,
-      total_price: totalNumeric,
-      image: image ? image.name : "",
-      kurir,
-      product_id: cart.map(item => item.id).join(', '),
-      user_id: userId // Pass userId, ensuring it's not an empty string
-    };
+    const userId = user_id;
+    const timestamp = new Date().toISOString(); // Get the current timestamp
   
     try {
-      await placeOrder(orderData); // Submit order to the database
+      // Upload image to Firebase Storage and get download URL
+      const imageUrl = image ? await handleImageUpload(image) : '';
+  
+      const orderData = {
+        quantity: amount,
+        total_price: totalNumeric,
+        image: imageUrl, // Use the Firebase Storage download URL
+        kurir,
+        Date: timestamp, // Add timestamp to the orderData
+        id_user: userId, // Pass userId, ensuring it's not an empty string
+        products: cart // Include products in orderData
+      };
+  
+      // Place the order and get the returned order ID
+      const newOrder = await placeOrder(orderData);
+  
+      if (!newOrder || !newOrder.order_id) {
+        throw new Error('Invalid order response: missing order_id');
+      }
+  
       window.open(`https://wa.me/${phoneNumber}`, '_blank');
       navigate('/'); // Navigate to home after submitting
     } catch (error) {
       console.error('Failed to place order', error);
     }
   };
-  
-  
 
   useEffect(() => {
     if (timeLeft === 0 && !image) {
@@ -89,44 +105,47 @@ function Checkout() {
         <p><span>Total Item:</span>{amount}</p>
         <p><span>Total Price:</span>{`Rp ${Math.round(total || 0)}k`}</p>
 
-        
-        <label htmlFor="Kurir" className="block mb-1">Kurir</label>
-          <select
-            id="Kurir"
-            value={kurir}
-            onChange={(e) => setKurir(e.target.value)}
-            className="w-full border border-gray-300 rounded-md px-4 py-2"
-            required
-          >
-            <option value="">Select Kurir</option>
-            <option value="JNE">JNE</option>
-            <option value="J&T">J&T</option>
-            <option value="SiCepat">SiCepat</option>
-            <option value="Tiki">Tiki</option>
-            <option value="Anteraja">Anteraja</option>
-          </select>
-        <div>
-          <input
-            type="file"
-            accept="image/*"
-            onChange={handleImageChange}
-            className="mt-4"
-          />
-          {image && (
-            <img
-              src={URL.createObjectURL(image)}
-              alt="Selected Image"
-              className="mt-4 max-w-full"
+        <div className="flex items-start gap-4">
+          <div className="w-1/2">
+            <label htmlFor="Kurir" className="block mb-1">Kurir</label>
+            <select
+              id="Kurir"
+              value={kurir}
+              onChange={(e) => setKurir(e.target.value)}
+              className="w-[180px] border-gray-300 rounded-md px-4 py-2"
+              required
+            >
+              <option value="">Select Kurir</option>
+              <option value="JNE">JNE</option>
+              <option value="J&T">J&T</option>
+              <option value="SiCepat">SiCepat</option>
+              <option value="Tiki">Tiki</option>
+              <option value="Anteraja">Anteraja</option>
+            </select>
+          </div>
+          <div className="w-1/2">
+            <label htmlFor="Image" className="block mb-1">Bukti Pembayaran</label>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleImageChange}
+              className="block mt-4"
             />
-          )}
-          
-          <button
-            onClick={handleSubmit}
-            disabled={!(image && kurir)}
-            className="bg-blue-500 text-white px-4 py-2 rounded mt-4"
-          >
-            Submit
-          </button>
+            {image && (
+              <img
+                src={URL.createObjectURL(image)}
+                alt="Selected Image"
+                className="mt-4 w-[180px] h-[180px]"
+              />
+            )}
+            <button
+              onClick={handleSubmit}
+              disabled={!(image && kurir)}
+              className="bg-blue-500 text-white px-4 py-2 rounded mt-4"
+            >
+              Submit
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -134,6 +153,14 @@ function Checkout() {
 }
 
 export default Checkout;
+
+
+
+
+
+
+
+
 
 
 
